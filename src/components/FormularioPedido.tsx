@@ -12,10 +12,8 @@ const ORDEN_DIAS: Record<string, number> = {
 }
 
 function diasDisponibles(dias: Dia[]): Dia[] {
-  const ahora = new Date()
-  const utc = ahora.getTime() + ahora.getTimezoneOffset() * 60000
-  const mx = new Date(utc - 6 * 3600000)
-  const diaSemanaHoy = mx.getDay()  // 0=Dom, 1=Lun, 2=Mar...
+  const mx = new Date() // hora local del dispositivo, sin conversión
+  const diaSemanaHoy = mx.getDay()
   const horaHoy = mx.getHours()
 
   return dias.filter((dia) => {
@@ -24,11 +22,7 @@ function diasDisponibles(dias: Dia[]): Dia[] {
     if (diaSemana === undefined) return false
 
     let diff = diaSemana - diaSemanaHoy
-
-    // Si diff es negativo o cero, el día ya pasó esta semana
     if (diff <= 0) return false
-
-    // Si es mañana (diff === 1) solo disponible antes de las 12pm
     if (diff === 1 && horaHoy >= HORA_CIERRE) return false
 
     return true
