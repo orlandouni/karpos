@@ -1,7 +1,8 @@
 import {groq} from 'next-sanity'
 
-export const menuQuery = groq`*[_type == "menuSemanal"][0]{
+export const menuQuery = groq`*[_type == "menuSemanal"] | order(_updatedAt desc) [0]{
   semana,
+  descuentoSemanal,
   dias[]{ nombre, platillo, descripcion, precio }
 }`
 
@@ -18,6 +19,7 @@ export type Dia = {
 
 export type Menu = {
   semana?: string
+  descuentoSemanal?: number
   dias?: Dia[]
 }
 

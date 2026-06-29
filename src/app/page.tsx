@@ -80,8 +80,12 @@ export default async function Home() {
 
       {/* Formulario de pedido */}
       {dias.length > 0 && waNumero && (
-        <FormularioPedido dias={dias} waNumero={waNumero} />
-      )}
+  <FormularioPedido
+    dias={dias}
+    waNumero={waNumero}
+    descuentoSemanal={menu?.descuentoSemanal}
+  />
+)}
 
       {/* Contacto */}
       <section className="mt-10 rounded-2xl border border-borde bg-crema-card px-6 py-10 text-center">

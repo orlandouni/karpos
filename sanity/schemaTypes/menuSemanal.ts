@@ -39,6 +39,13 @@ export const menuSemanal = defineType({
         }),
       ],
     }),
+    defineField({
+      name: 'descuentoSemanal',
+      title: 'Descuento paquete semanal (%)',
+      type: 'number',
+      description: 'Porcentaje de descuento al pedir toda la semana. Ej: 10 para 10%. Déjalo vacío si no hay descuento esta semana.',
+      validation: (Rule) => Rule.min(0).max(50),
+    }),
   ],
   preview: {
     prepare: () => ({title: 'Menú de la semana'}),

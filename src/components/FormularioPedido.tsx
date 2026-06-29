@@ -32,9 +32,11 @@ function diasDisponibles(dias: Dia[]): Dia[] {
 export default function FormularioPedido({
   dias,
   waNumero,
+  descuentoSemanal,
 }: {
   dias: Dia[]
   waNumero: string
+  descuentoSemanal?: number
 }) {
   const disponibles = diasDisponibles(dias)
   const [nombre, setNombre] = useState('')
@@ -60,6 +62,12 @@ export default function FormularioPedido({
 
   const diasPedido = disponibles.filter((d) => seleccionados.has(d.nombre ?? ''))
   const todoSeleccionado = seleccionados.size === disponibles.length && disponibles.length > 0
+  const totalNormal = diasPedido.reduce((sum, d) => sum + (d.precio ?? 0), 0)
+  const esPaqueteSemanal = todoSeleccionado && !!descuentoSemanal && descuentoSemanal > 0
+  const totalConDescuento = esPaqueteSemanal
+    ? Math.round(totalNormal * (1 - descuentoSemanal / 100))
+    : totalNormal
+  const ahorras = totalNormal - totalConDescuento
 
   function handlePedir() {
     if (!nombre.trim() || diasPedido.length === 0) return
@@ -68,21 +76,22 @@ export default function FormularioPedido({
       .map((d) => `  • ${d.nombre}: ${d.platillo}${d.precio ? ` ($${d.precio})` : ''}`)
       .join('\n')
 
-    const total = diasPedido.reduce((sum, d) => sum + (d.precio ?? 0), 0)
-
     const mensaje = [
       `¡Hola KARPOS! 🌿 Quiero hacer un pedido:`,
       ``,
       `👤 Nombre: ${nombre.trim()}`,
       telefono.trim() ? `📞 Teléfono: ${telefono.trim()}` : '',
       ``,
-      `📅 Días pedidos:`,
+      esPaqueteSemanal ? `📦 Paquete semanal (${descuentoSemanal}% de descuento)` : `📅 Días pedidos:`,
       lineasPlatillos,
-      total > 0 ? `\n💰 Total: $${total}` : '',
+      ``,
+      esPaqueteSemanal
+        ? `💰 Total con descuento: $${totalConDescuento} (ahorras $${ahorras})`
+        : totalNormal > 0 ? `💰 Total: $${totalNormal}` : '',
       ``,
       `Pago en efectivo al recoger. ¡Gracias!`,
     ]
-      .filter((l) => l !== undefined && l !== null)
+      .filter((l) => l !== null && l !== undefined)
       .join('\n')
 
     const url = `https://wa.me/${waNumero}?text=${encodeURIComponent(mensaje)}`
@@ -115,6 +124,16 @@ export default function FormularioPedido({
       <p className="mt-1 text-center text-sm text-cocoa-soft">
         Elige uno o varios días · pedidos con un día de anticipación antes de las 12pm
       </p>
+
+      {/* Banner de descuento semanal */}
+      {descuentoSemanal && descuentoSemanal > 0 && (
+        <div className="mt-5 rounded-xl border border-salvia/40 bg-salvia/10 px-4 py-3 text-center">
+          <p className="text-sm text-cocoa">
+            🌿 Pide <span className="font-semibold">toda la semana</span> y obtén{' '}
+            <span className="font-semibold text-salvia">{descuentoSemanal}% de descuento</span>
+          </p>
+        </div>
+      )}
 
       <div className="mt-8 grid gap-5 sm:grid-cols-2">
         {/* Nombre */}
@@ -182,26 +201,54 @@ export default function FormularioPedido({
           </div>
         </div>
 
-        {/* Resumen del pedido */}
+        {/* Resumen */}
         {diasPedido.length > 0 && (
           <div className="sm:col-span-2 rounded-xl border border-arena/30 bg-arena/5 px-5 py-4">
-            <p className="text-xs uppercase tracking-widest text-salvia mb-2">Resumen</p>
+            <div className="flex items-center justify-between mb-2">
+              <p className="text-xs uppercase tracking-widest text-salvia">Resumen</p>
+              {esPaqueteSemanal && (
+                <span className="text-xs rounded-full bg-salvia/20 text-salvia px-3 py-0.5 font-semibold">
+                  Paquete semanal
+                </span>
+              )}
+            </div>
             <div className="space-y-1">
               {diasPedido.map((d) => (
                 <div key={d.nombre} className="flex justify-between text-sm">
-                  <span className="text-cocoa-soft">{d.nombre} — <span className="text-cocoa font-serif">{d.platillo}</span></span>
+                  <span className="text-cocoa-soft">
+                    {d.nombre} —{' '}
+                    <span className="text-cocoa font-serif">{d.platillo}</span>
+                  </span>
                   {d.precio && <span className="text-arena">${d.precio}</span>}
                 </div>
               ))}
-            </div>
-            {diasPedido.some((d) => d.precio) && (
-              <div className="mt-3 flex justify-between border-t border-arena/20 pt-2 text-sm font-semibold">
-                <span className="text-cocoa">Total</span>
-                <span className="text-arena">
-                  ${diasPedido.reduce((sum, d) => sum + (d.precio ?? 0), 0)}
-                </span>
+
+            {totalNormal > 0 && (
+              <div className="mt-3 border-t border-arena/20 pt-2 space-y-1">
+                {esPaqueteSemanal ? (
+                  <>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-cocoa-soft">Subtotal</span>
+                      <span className="text-cocoa-soft line-through">${totalNormal}</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-salvia">Descuento {descuentoSemanal}%</span>
+                      <span className="text-salvia">− ${ahorras}</span>
+                    </div>
+                    <div className="flex justify-between text-sm font-semibold">
+                      <span className="text-cocoa">Total</span>
+                      <span className="text-arena">${totalConDescuento}</span>
+                    </div>
+                  </>
+                ) : (
+                  <div className="flex justify-between text-sm font-semibold">
+                    <span className="text-cocoa">Total</span>
+                    <span className="text-arena">${totalNormal}</span>
+                  </div>
+                )}
               </div>
             )}
+            </div>
           </div>
         )}
       </div>
@@ -223,7 +270,9 @@ export default function FormularioPedido({
             disabled={!nombre.trim() || diasPedido.length === 0}
             className="inline-flex items-center gap-2 rounded-full bg-salvia px-8 py-3 text-sm font-semibold uppercase tracking-wide text-white transition-opacity hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed"
           >
-            {diasPedido.length > 1
+            {esPaqueteSemanal
+              ? `Pedir paquete semanal por WhatsApp`
+              : diasPedido.length > 1
               ? `Pedir ${diasPedido.length} días por WhatsApp`
               : 'Pedir por WhatsApp'}
           </button>
