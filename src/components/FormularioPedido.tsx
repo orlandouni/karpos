@@ -3,7 +3,7 @@
 import {useState} from 'react'
 import type {Dia} from '@/sanity/queries'
 
-const HORA_CIERRE = 12
+const HORA_CIERRE = 15
 const COSTO_DOMICILIO = 40
 
 const ORDEN_DIAS: Record<string, number> = {
