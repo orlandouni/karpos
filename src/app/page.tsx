@@ -1,8 +1,8 @@
 import Image from 'next/image'
 import {client} from '@/sanity/client'
 import {menuQuery, contactoQuery, type Menu, type Contacto} from '@/sanity/queries'
+import FormularioPedido from '@/components/FormularioPedido'
 
-// Respaldo: revalida cada 5 min aunque no llegue el webhook.
 export const revalidate = 300
 
 async function getData() {
@@ -18,9 +18,6 @@ export default async function Home() {
   const dias = menu?.dias ?? []
 
   const waNumero = contacto?.whatsapp ? `52${contacto.whatsapp.replace(/\D/g, '')}` : null
-  const waLink = waNumero
-    ? `https://wa.me/${waNumero}?text=${encodeURIComponent('¡Hola KARPOS! Me gustaría hacer un pedido 🌿')}`
-    : null
 
   return (
     <main className="mx-auto max-w-4xl px-5 py-12 sm:py-16">
@@ -60,10 +57,7 @@ export default async function Home() {
         ) : (
           <div className="mt-8 grid gap-4 sm:grid-cols-2">
             {dias.map((dia, i) => (
-              <article
-                key={i}
-                className="rounded-xl border border-borde bg-crema-card p-5"
-              >
+              <article key={i} className="rounded-xl border border-borde bg-crema-card p-5">
                 <div className="flex items-baseline justify-between border-b border-borde pb-2">
                   <span className="text-xs uppercase tracking-[0.2em] text-salvia">
                     {dia.nombre}
@@ -84,30 +78,21 @@ export default async function Home() {
         )}
       </section>
 
-      {/* Contacto */}
-      <section className="mt-16 rounded-2xl border border-borde bg-crema-card px-6 py-10 text-center">
-        <h2 className="font-serif text-3xl text-cocoa">Haz tu pedido</h2>
+      {/* Formulario de pedido */}
+      {dias.length > 0 && waNumero && (
+        <FormularioPedido dias={dias} waNumero={waNumero} />
+      )}
 
+      {/* Contacto */}
+      <section className="mt-10 rounded-2xl border border-borde bg-crema-card px-6 py-10 text-center">
+        <h2 className="font-serif text-3xl text-cocoa">¿Tienes dudas?</h2>
         {contacto?.horario && (
           <p className="mt-2 text-cocoa-soft">{contacto.horario}</p>
         )}
-
-        {waLink && (
-          <a
-            href={waLink}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="mt-6 inline-flex items-center gap-2 rounded-full bg-salvia px-7 py-3 text-sm font-semibold uppercase tracking-wide text-white transition-opacity hover:opacity-90"
-          >
-            Pedir por WhatsApp
-          </a>
-        )}
-
-        <div className="mt-8 space-y-1 text-cocoa-soft">
+        <div className="mt-6 space-y-1 text-cocoa-soft">
           {contacto?.telefono && <p>Tel. {contacto.telefono}</p>}
           {contacto?.direccion && <p>{contacto.direccion}</p>}
         </div>
-
         {(contacto?.facebook || contacto?.instagram) && (
           <div className="mt-6 flex items-center justify-center gap-5 text-sm text-arena">
             {contacto.facebook && (
