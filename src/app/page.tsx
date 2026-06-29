@@ -51,31 +51,58 @@ export default async function Home() {
         </div>
 
         {dias.length === 0 ? (
-          <p className="mt-10 text-center text-cocoa-soft">
-            Pronto publicaremos el menú de esta semana.
-          </p>
-        ) : (
-          <div className="mt-8 grid gap-4 sm:grid-cols-2">
-            {dias.map((dia, i) => (
-              <article key={i} className="rounded-xl border border-borde bg-crema-card p-5">
-                <div className="flex items-baseline justify-between border-b border-borde pb-2">
-                  <span className="text-xs uppercase tracking-[0.2em] text-salvia">
-                    {dia.nombre}
-                  </span>
-                  {typeof dia.precio === 'number' && (
-                    <span className="text-sm text-arena">${dia.precio}</span>
-                  )}
-                </div>
-                <h3 className="mt-3 font-serif text-2xl text-cocoa">{dia.platillo}</h3>
-                {dia.descripcion && (
-                  <p className="mt-1 font-serif text-lg italic leading-snug text-cocoa-soft">
-                    {dia.descripcion}
-                  </p>
-                )}
-              </article>
-            ))}
+  <p className="mt-10 text-center text-cocoa-soft">
+    Pronto publicaremos el menú de esta semana.
+  </p>
+) : (
+  <div className="mt-8 grid gap-4 sm:grid-cols-2">
+    {dias.map((dia, i) => {
+      const orden: Record<string, number> = {
+        Lunes: 1, Martes: 2, Miércoles: 3, Jueves: 4,
+        Viernes: 5, Sábado: 6, Domingo: 0,
+      }
+      const hoy = new Date()
+      const diaNum = orden[dia.nombre ?? '']
+      const diff = diaNum !== undefined ? diaNum - hoy.getDay() : 1
+      const agotado = diff <= 0 || (diff === 1 && hoy.getHours() >= 15)
+
+      return (
+        <article
+          key={i}
+          className={`rounded-xl border p-5 ${
+            agotado
+              ? 'border-borde bg-crema-card opacity-50'
+              : 'border-borde bg-crema-card'
+          }`}
+        >
+          <div className="flex items-baseline justify-between border-b border-borde pb-2">
+            <div className="flex items-center gap-2">
+              <span className="text-xs uppercase tracking-[0.2em] text-salvia">
+                {dia.nombre}
+              </span>
+              {agotado && (
+                <span className="text-xs rounded-full bg-cocoa/10 text-cocoa-soft px-2 py-0.5">
+                  No se aceptan pedidos
+                </span>
+              )}
+            </div>
+            {typeof dia.precio === 'number' && (
+              <span className="text-sm text-arena">${dia.precio}</span>
+            )}
           </div>
-        )}
+          <h3 className={`mt-3 font-serif text-2xl ${agotado ? 'text-cocoa-soft' : 'text-cocoa'}`}>
+            {dia.platillo}
+          </h3>
+          {dia.descripcion && (
+            <p className="mt-1 font-serif text-lg italic leading-snug text-cocoa-soft">
+              {dia.descripcion}
+            </p>
+          )}
+        </article>
+      )
+    })}
+  </div>
+)}
       </section>
 
       {/* Formulario de pedido */}
