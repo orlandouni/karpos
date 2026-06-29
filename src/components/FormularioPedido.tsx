@@ -81,25 +81,25 @@ export default function FormularioPedido({
       .join('\n')
 
     const mensaje = [
-      `¡Hola KARPOS! 🌿 Quiero hacer un pedido:`,
-      ``,
-      `👤 Nombre: ${nombre.trim()}`,
-      telefono.trim() ? `📞 Teléfono: ${telefono.trim()}` : '',
-      `📍 Dirección: ${direccion.trim()}`,
-      `🕐 Horario de entrega: ${horarioEntrega.trim()}`,
-      ``,
-      esPaqueteSemanal ? `📦 Paquete semanal (${descuentoSemanal}% de descuento)` : `📅 Días pedidos:`,
-      lineasPlatillos,
-      ``,
-      esPaqueteSemanal
-        ? `💰 Total con descuento: $${totalConDescuento} (ahorras $${ahorras})`
-        : totalNormal > 0 ? `💰 Total: $${totalNormal}` : '',
-      ``,
-      `Pago en efectivo al recoger. ¡Gracias!`,
-    ]
-      .filter((l) => l !== null && l !== undefined && l !== '')
-      .join('\n')
-
+  `¡Hola KARPOS! Quiero hacer un pedido:`,
+  ``,
+  `Nombre: ${nombre.trim()}`,
+  telefono.trim() ? `Tel: ${telefono.trim()}` : '',
+  `Direccion: ${direccion.trim()}`,
+  `Horario de entrega: ${horarioEntrega.trim()}`,
+  ``,
+  esPaqueteSemanal ? `Paquete semanal (${descuentoSemanal}% de descuento)` : `Dias pedidos:`,
+  lineasPlatillos,
+  ``,
+  esPaqueteSemanal
+    ? `Total con descuento: $${totalConDescuento} (ahorras $${ahorras})`
+    : totalNormal > 0 ? `Total: $${totalNormal}` : '',
+  ``,
+  `Pago en efectivo al recoger. Gracias!`,
+]
+  .filter((l) => l !== null && l !== undefined && l !== '')
+  .join('\n')
+   
     const url = `https://wa.me/${waNumero}?text=${encodeURIComponent(mensaje)}`
     window.open(url, '_blank')
     setEnviado(true)
