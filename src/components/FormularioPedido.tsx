@@ -140,7 +140,7 @@ export default function FormularioPedido({
     <section className="mt-10 rounded-2xl border border-borde bg-crema-card px-6 py-10">
       <h2 className="font-serif text-3xl text-cocoa text-center">Hacer un pedido</h2>
       <p className="mt-1 text-center text-sm text-cocoa-soft">
-        Elige uno o varios dias · pedidos con un dia de anticipacion antes de las 12pm
+        Elige uno o varios dias · pedidos con un dia de anticipacion antes de las 3pm
       </p>
 
       {/* Banner descuento */}
