@@ -61,10 +61,13 @@ export default async function Home() {
         Lunes: 1, Martes: 2, Miércoles: 3, Jueves: 4,
         Viernes: 5, Sábado: 6, Domingo: 0,
       }
-      const hoy = new Date()
-      const diaNum = orden[dia.nombre ?? '']
-      const diff = diaNum !== undefined ? diaNum - hoy.getDay() : 1
-      const agotado = diff <= 0 || (diff === 1 && hoy.getHours() >= 15)
+     const hoy = new Date()
+// Convertir a hora de Sonora (UTC-7 en verano, UTC-6 sin horario de verano)
+// Sonora NO usa horario de verano, siempre UTC-7
+const horasSonora = new Date(hoy.toLocaleString('en-US', { timeZone: 'America/Hermosillo' }))
+const diaNum = orden[dia.nombre ?? '']
+const diff = diaNum !== undefined ? diaNum - horasSonora.getDay() : 1
+const agotado = diff <= 0 || (diff === 1 && horasSonora.getHours() >= 15)
 
       return (
         <article

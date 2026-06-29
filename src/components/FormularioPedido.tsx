@@ -12,7 +12,7 @@ const ORDEN_DIAS: Record<string, number> = {
 }
 
 function diasDisponibles(dias: Dia[]): Dia[] {
-  const mx = new Date() // hora local del dispositivo, sin conversión
+  const mx = new Date(new Date().toLocaleString('en-US', { timeZone: 'America/Hermosillo' }))
   const diaSemanaHoy = mx.getDay()
   const horaHoy = mx.getHours()
 
@@ -20,11 +20,9 @@ function diasDisponibles(dias: Dia[]): Dia[] {
     if (!dia.nombre) return false
     const diaSemana = ORDEN_DIAS[dia.nombre]
     if (diaSemana === undefined) return false
-
     let diff = diaSemana - diaSemanaHoy
     if (diff <= 0) return false
     if (diff === 1 && horaHoy >= HORA_CIERRE) return false
-
     return true
   })
 }
