@@ -15,17 +15,22 @@ function diasDisponibles(dias: Dia[]): Dia[] {
   const ahora = new Date()
   const utc = ahora.getTime() + ahora.getTimezoneOffset() * 60000
   const mx = new Date(utc - 6 * 3600000)
-  const diaSemanaHoy = mx.getDay()
+  const diaSemanaHoy = mx.getDay()  // 0=Dom, 1=Lun, 2=Mar...
   const horaHoy = mx.getHours()
 
   return dias.filter((dia) => {
     if (!dia.nombre) return false
     const diaSemana = ORDEN_DIAS[dia.nombre]
     if (diaSemana === undefined) return false
+
     let diff = diaSemana - diaSemanaHoy
-    if (diff < 0) diff += 7
-    if (diff === 0) diff = 7
+
+    // Si diff es negativo o cero, el día ya pasó esta semana
+    if (diff <= 0) return false
+
+    // Si es mañana (diff === 1) solo disponible antes de las 12pm
     if (diff === 1 && horaHoy >= HORA_CIERRE) return false
+
     return true
   })
 }
