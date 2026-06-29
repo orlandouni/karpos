@@ -3,7 +3,7 @@ import {client} from '@/sanity/client'
 import {menuQuery, contactoQuery, type Menu, type Contacto} from '@/sanity/queries'
 import FormularioPedido from '@/components/FormularioPedido'
 
-export const revalidate = 300
+export const revalidate = 60
 
 async function getData() {
   const [menu, contacto] = await Promise.all([
@@ -67,7 +67,7 @@ export default async function Home() {
 const horasSonora = new Date(hoy.toLocaleString('en-US', { timeZone: 'America/Hermosillo' }))
 const diaNum = orden[dia.nombre ?? '']
 const diff = diaNum !== undefined ? diaNum - horasSonora.getDay() : 1
-const agotado = diff <= 0 || (diff === 1 && horasSonora.getHours() >= 15)
+const agotado = diff < 0 || (diff === 0 && horasSonora.getHours() >= 8)
 
       return (
         <article

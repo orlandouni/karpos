@@ -3,7 +3,7 @@
 import {useState} from 'react'
 import type {Dia} from '@/sanity/queries'
 
-const HORA_CIERRE = 15
+const HORA_CIERRE = 8
 const COSTO_DOMICILIO = 40
 
 const ORDEN_DIAS: Record<string, number> = {
@@ -22,7 +22,7 @@ function diasDisponibles(dias: Dia[]): Dia[] {
     if (diaSemana === undefined) return false
     let diff = diaSemana - diaSemanaHoy
     if (diff <= 0) return false
-    if (diff === 1 && horaHoy >= HORA_CIERRE) return false
+    if (diff === 0 && horaHoy >= HORA_CIERRE) return false
     return true
   })
 }
