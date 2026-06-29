@@ -41,6 +41,8 @@ export default function FormularioPedido({
   const disponibles = diasDisponibles(dias)
   const [nombre, setNombre] = useState('')
   const [telefono, setTelefono] = useState('')
+  const [direccion, setDireccion] = useState('')
+  const [horarioEntrega, setHorarioEntrega] = useState('')
   const [seleccionados, setSeleccionados] = useState<Set<string>>(new Set())
   const [enviado, setEnviado] = useState(false)
 
@@ -69,8 +71,10 @@ export default function FormularioPedido({
     : totalNormal
   const ahorras = totalNormal - totalConDescuento
 
+  const formValido = nombre.trim() && direccion.trim() && horarioEntrega.trim() && diasPedido.length > 0
+
   function handlePedir() {
-    if (!nombre.trim() || diasPedido.length === 0) return
+    if (!formValido) return
 
     const lineasPlatillos = diasPedido
       .map((d) => `  • ${d.nombre}: ${d.platillo}${d.precio ? ` ($${d.precio})` : ''}`)
@@ -81,6 +85,8 @@ export default function FormularioPedido({
       ``,
       `👤 Nombre: ${nombre.trim()}`,
       telefono.trim() ? `📞 Teléfono: ${telefono.trim()}` : '',
+      `📍 Dirección: ${direccion.trim()}`,
+      `🕐 Horario de entrega: ${horarioEntrega.trim()}`,
       ``,
       esPaqueteSemanal ? `📦 Paquete semanal (${descuentoSemanal}% de descuento)` : `📅 Días pedidos:`,
       lineasPlatillos,
@@ -91,7 +97,7 @@ export default function FormularioPedido({
       ``,
       `Pago en efectivo al recoger. ¡Gracias!`,
     ]
-      .filter((l) => l !== null && l !== undefined)
+      .filter((l) => l !== null && l !== undefined && l !== '')
       .join('\n')
 
     const url = `https://wa.me/${waNumero}?text=${encodeURIComponent(mensaje)}`
@@ -104,6 +110,8 @@ export default function FormularioPedido({
     setSeleccionados(new Set())
     setNombre('')
     setTelefono('')
+    setDireccion('')
+    setHorarioEntrega('')
   }
 
   if (disponibles.length === 0) {
@@ -125,7 +133,7 @@ export default function FormularioPedido({
         Elige uno o varios días · pedidos con un día de anticipación antes de las 12pm
       </p>
 
-      {/* Banner de descuento semanal */}
+      {/* Banner de descuento */}
       {descuentoSemanal && descuentoSemanal > 0 && (
         <div className="mt-5 rounded-xl border border-salvia/40 bg-salvia/10 px-4 py-3 text-center">
           <p className="text-sm text-cocoa">
@@ -136,9 +144,12 @@ export default function FormularioPedido({
       )}
 
       <div className="mt-8 grid gap-5 sm:grid-cols-2">
+
         {/* Nombre */}
         <div className="flex flex-col gap-1">
-          <label className="text-xs uppercase tracking-widest text-salvia">Tu nombre</label>
+          <label className="text-xs uppercase tracking-widest text-salvia">
+            Tu nombre <span className="text-red-400">*</span>
+          </label>
           <input
             type="text"
             placeholder="Nombre completo"
@@ -162,10 +173,40 @@ export default function FormularioPedido({
           />
         </div>
 
+        {/* Dirección */}
+        <div className="flex flex-col gap-1 sm:col-span-2">
+          <label className="text-xs uppercase tracking-widest text-salvia">
+            Dirección de entrega <span className="text-red-400">*</span>
+          </label>
+          <input
+            type="text"
+            placeholder="Calle, número, colonia"
+            value={direccion}
+            onChange={(e) => setDireccion(e.target.value)}
+            className="rounded-lg border border-borde bg-crema px-4 py-3 text-cocoa placeholder:text-cocoa-soft/50 focus:outline-none focus:ring-1 focus:ring-arena"
+          />
+        </div>
+
+        {/* Horario de entrega */}
+        <div className="flex flex-col gap-1 sm:col-span-2">
+          <label className="text-xs uppercase tracking-widest text-salvia">
+            Horario de entrega <span className="text-red-400">*</span>
+          </label>
+          <input
+            type="text"
+            placeholder="Ej: entre 12pm y 1pm, o a las 2pm"
+            value={horarioEntrega}
+            onChange={(e) => setHorarioEntrega(e.target.value)}
+            className="rounded-lg border border-borde bg-crema px-4 py-3 text-cocoa placeholder:text-cocoa-soft/50 focus:outline-none focus:ring-1 focus:ring-arena"
+          />
+        </div>
+
         {/* Selector de días */}
         <div className="flex flex-col gap-3 sm:col-span-2">
           <div className="flex items-center justify-between">
-            <label className="text-xs uppercase tracking-widest text-salvia">¿Qué días?</label>
+            <label className="text-xs uppercase tracking-widest text-salvia">
+              ¿Qué días? <span className="text-red-400">*</span>
+            </label>
             <button
               onClick={seleccionarTodo}
               className="text-xs text-arena underline underline-offset-2 hover:text-cocoa transition-colors"
@@ -223,31 +264,31 @@ export default function FormularioPedido({
                 </div>
               ))}
 
-            {totalNormal > 0 && (
-              <div className="mt-3 border-t border-arena/20 pt-2 space-y-1">
-                {esPaqueteSemanal ? (
-                  <>
-                    <div className="flex justify-between text-sm">
-                      <span className="text-cocoa-soft">Subtotal</span>
-                      <span className="text-cocoa-soft line-through">${totalNormal}</span>
-                    </div>
-                    <div className="flex justify-between text-sm">
-                      <span className="text-salvia">Descuento {descuentoSemanal}%</span>
-                      <span className="text-salvia">− ${ahorras}</span>
-                    </div>
+              {totalNormal > 0 && (
+                <div className="mt-3 border-t border-arena/20 pt-2 space-y-1">
+                  {esPaqueteSemanal ? (
+                    <>
+                      <div className="flex justify-between text-sm">
+                        <span className="text-cocoa-soft">Subtotal</span>
+                        <span className="text-cocoa-soft line-through">${totalNormal}</span>
+                      </div>
+                      <div className="flex justify-between text-sm">
+                        <span className="text-salvia">Descuento {descuentoSemanal}%</span>
+                        <span className="text-salvia">− ${ahorras}</span>
+                      </div>
+                      <div className="flex justify-between text-sm font-semibold">
+                        <span className="text-cocoa">Total</span>
+                        <span className="text-arena">${totalConDescuento}</span>
+                      </div>
+                    </>
+                  ) : (
                     <div className="flex justify-between text-sm font-semibold">
                       <span className="text-cocoa">Total</span>
-                      <span className="text-arena">${totalConDescuento}</span>
+                      <span className="text-arena">${totalNormal}</span>
                     </div>
-                  </>
-                ) : (
-                  <div className="flex justify-between text-sm font-semibold">
-                    <span className="text-cocoa">Total</span>
-                    <span className="text-arena">${totalNormal}</span>
-                  </div>
-                )}
-              </div>
-            )}
+                  )}
+                </div>
+              )}
             </div>
           </div>
         )}
@@ -267,11 +308,11 @@ export default function FormularioPedido({
         ) : (
           <button
             onClick={handlePedir}
-            disabled={!nombre.trim() || diasPedido.length === 0}
+            disabled={!formValido}
             className="inline-flex items-center gap-2 rounded-full bg-salvia px-8 py-3 text-sm font-semibold uppercase tracking-wide text-white transition-opacity hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed"
           >
             {esPaqueteSemanal
-              ? `Pedir paquete semanal por WhatsApp`
+              ? 'Pedir paquete semanal por WhatsApp'
               : diasPedido.length > 1
               ? `Pedir ${diasPedido.length} días por WhatsApp`
               : 'Pedir por WhatsApp'}
