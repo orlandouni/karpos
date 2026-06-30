@@ -3,7 +3,7 @@
 import {useState} from 'react'
 import type {Dia} from '@/sanity/queries'
 
-const HORA_CIERRE = 8
+const HORA_CIERRE = 11
 const COSTO_DOMICILIO = 40
 
 const ORDEN_DIAS: Record<string, number> = {
@@ -138,7 +138,7 @@ export default function FormularioPedido({
     <section className="mt-10 rounded-2xl border border-borde bg-crema-card px-6 py-10">
       <h2 className="font-serif text-3xl text-cocoa text-center">Hacer un pedido</h2>
       <p className="mt-1 text-center text-sm text-cocoa-soft">
-        Elige uno o varios dias · pedidos antes de las 8am del dia que quieres pedir · pago en efectivo al recibir
+        Elige uno o varios dias · pedidos antes de las 11am del dia que quieres pedir · pago en efectivo al recibir
       </p>
 
       {/* Banner descuento */}

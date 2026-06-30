@@ -67,9 +67,9 @@ export default async function Home() {
 const horasSonora = new Date(hoy.toLocaleString('en-US', { timeZone: 'America/Hermosillo' }))
 const diaNum = orden[dia.nombre ?? '']
 const diff = diaNum !== undefined ? diaNum - horasSonora.getDay() : 1
-const agotado = diff < 0 || (diff === 0 && horasSonora.getHours() >= 8)
+const agotado = diff < 0 || (diff === 0 && horasSonora.getHours() >= 11)
 
-      return (
+      return (  
         <article
           key={i}
           className={`rounded-xl border p-5 ${
